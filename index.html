@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KrishiMitra AI - V2</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="login-overlay" class="overlay active">
+        <div class="login-card">
+            <h1>🌾 KrishiMitra AI</h1>
+            <p data-en="Enter numeric Farmer ID to login." data-hi="लॉगिन करने के लिए संख्यात्मक किसान आईडी दर्ज करें।">Enter numeric Farmer ID to login.</p>
+            <div class="input-field">
+                <label for="farmer-id" data-en="Farmer ID (Numbers Only)" data-hi="किसान आईडी (केवल नंबर)">Farmer ID (Numbers Only)</label>
+                <input type="text" id="farmer-id" placeholder="e.g. 123456" autocomplete="off">
+            </div>
+            <div id="login-error" class="text-danger text-sm mb-2 hidden">Please enter numbers only.</div>
+            <button id="login-btn" class="btn-primary" data-en="Secure Login" data-hi="सुरक्षित लॉगिन">Secure Login</button>
+            <div id="login-loader" class="loader hidden"></div>
+        </div>
+    </div>
+
+    <div id="main-app" class="app-container hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" style="overflow-y: auto;">
+            <div class="sidebar-header">
+                <h2>🌾 KrishiMitra AI</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="view-dashboard"><span class="icon">📊</span> <span data-en="Overview" data-hi="अवलोकन">Overview</span></a>
+                <a href="#" class="nav-item" data-target="view-weather"><span class="icon">🌦️</span> <span data-en="Real-Time Weather" data-hi="मौसम">Real-Time Weather</span></a>
+                <a href="#" class="nav-item" data-target="view-crop"><span class="icon">🌾</span> <span data-en="Smart Crop" data-hi="स्मार्ट फसल">Smart Crop</span></a>
+                <a href="#" class="nav-item" data-target="view-irrigation"><span class="icon">💧</span> <span data-en="Smart Irrigation" data-hi="सिंचाई">Smart Irrigation</span></a>
+                <a href="#" class="nav-item" data-target="view-land-calc"><span class="icon">📏</span> <span data-en="Land Math" data-hi="भूमि माप">Land Math</span></a>
+                <a href="#" class="nav-item" data-target="view-fert-calc"><span class="icon">🧪</span> <span data-en="Fertilizers" data-hi="उर्वरक">Fertilizers</span></a>
+                <a href="#" class="nav-item" data-target="view-profit"><span class="icon">💰</span> <span data-en="Profit Estimator" data-hi="लाभ">Profit Estimator</span></a>
+                <a href="#" class="nav-item" data-target="view-market-crops"><span class="icon">🥦</span> <span data-en="Crops Market" data-hi="फसल बाज़ार">Crops Market</span></a>
+                <a href="#" class="nav-item" data-target="view-market-equip"><span class="icon">🚜</span> <span data-en="Equipment" data-hi="उपकरण">Equipment</span></a>
+                <a href="#" class="nav-item" data-target="view-market-land"><span class="icon">📍</span> <span data-en="Land Buy/Sell" data-hi="जमीन खरीद">Land Buy/Sell</span></a>
+                <a href="#" class="nav-item" data-target="view-contacts"><span class="icon">👷</span> <span data-en="Contact List" data-hi="सम्पर्क">Contact List</span></a>
+                <a href="#" class="nav-item" data-target="view-medicine"><span class="icon">💊</span> <span data-en="Medicine Guide" data-hi="दवा">Medicine Guide</span></a>
+                <a href="#" class="nav-item" data-target="view-loans"><span class="icon">🏦</span> <span data-en="Loan Schemes" data-hi="ऋण">Loan Schemes</span></a>
+                <a href="#" class="nav-item" data-target="view-monitor"><span class="icon">📷</span> <span data-en="Pollution Report" data-hi="प्रदूषण">Pollution Report</span></a>
+                <a href="#" class="nav-item pulse-nav" data-target="view-voice"><span class="icon">🎤</span> <span data-en="Voice AI Assistant" data-hi="आवाज़ सहायक">Voice AI Assistant</span></a>
+                <a href="#" class="nav-item" data-target="view-calendar"><span class="icon">📅</span> <span data-en="Farming Calendar" data-hi="कैलेंडर">Farming Calendar</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="emergency-btn" class="btn-danger blink-hover"><span class="icon">🚨</span> <span data-en="Emergency" data-hi="आपातकालीन">Emergency</span></button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-header" style="z-index: 50;">
+                <div class="header-left flex">
+                    <button id="menu-btn" class="btn-icon" style="margin-right: 1rem; display: none;">☰</button>
+                    <h2 class="text-xl font-bold text-primary-dark">🌾 KrishiMitra Hub</h2>
+                </div>
+                <div class="header-right">
+                    <span class="badge bg-danger text-white p-1 rounded font-bold text-xs" style="margin-right:1rem; cursor:help;" title="Editable Demo Database Active">DEMO BUILD</span>
+                    <button class="btn-secondary toggle-lang shadow" id="lang-toggle">🌐 English / हिंदी</button>
+                </div>
+            </header>
+
+            <div id="global-alerts-container"></div>
+
+            <div class="views-container">
+                <!-- DASHBOARD -->
+                <section id="view-dashboard" class="view active">
+                    <!-- Glassmorphic Animated Hero -->
+                    <div class="card mb-4 text-white" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); animation: fadein 0.4s ease; border: none; overflow: hidden; position: relative;">
+                        <!-- Subtle background pattern or shine -->
+                        <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); animation: spin 40s linear infinite; pointer-events: none;"></div>
+                        
+                        <div class="flex-between relative z-10" style="flex-wrap: wrap; gap: 1.5rem;">
+                            <!-- Welcome Text & Details -->
+                            <div class="anim-float">
+                                <h2 class="text-3xl font-bold mb-2 shadow-text">👋 <span id="dash-greeting">Good Morning, Farmer</span></h2>
+                                <p class="text-lg opacity-90 mb-1">🕤 <span id="datetime-display" class="font-bold">--:--:--</span></p>
+                                <p class="text-md opacity-90">📍 <span id="location-display">Fetching location...</span></p>
+                            </div>
+
+                            <!-- Editable Farmer Profile -->
+                            <div class="glass-panel p-4 rounded bg-white text-main" style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); min-width: 250px; border: 1px solid rgba(255,255,255,0.3);">
+                                <div class="flex" style="align-items:center;">
+                                    <img src="https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=100&q=80" class="profile-img shadow" style="width: 60px; height: 60px; border-color: white;" alt="Farmer">
+                                    <div class="text-white">
+                                        <h3 class="font-bold text-lg" contenteditable="true" style="outline:none; border-bottom: 1px dashed rgba(255,255,255,0.5);" title="Click to Edit">Ramesh Kumar ✏️</h3>
+                                        <p class="text-sm mt-1 opacity-90" contenteditable="true" style="outline:none;" title="Click to Edit">ID: <span id="dash-fid">9845-XYZ-22</span> ✏️</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="card bg-success-light border-success" style="animation: fadein 0.6s ease;">
+                            <h3 class="mb-3 text-xl font-bold">Farm Health Overview</h3>
+                            <div class="progress-bar"><div class="progress" style="width: 92%;">92%</div></div>
+                            <p class="mt-2 text-sm text-dark-green font-bold">Conditions are optimal. Soil moisture maintained.</p>
+                            <div class="grid-2 mt-3 p-3 bg-white rounded shadow-sm">
+                                <div><strong>Total Fields:</strong> <span contenteditable="true" class="text-primary-dark font-bold">3 ✏️</span></div>
+                                <div><strong>Total Area:</strong> <span contenteditable="true" class="text-primary-dark font-bold">12 Acres ✏️</span></div>
+                            </div>
+                        </div>
+                        <div class="card text-center" style="animation: fadein 0.8s ease;">
+                            <h3 class="mb-3 text-xl font-bold">Quick Control Actions</h3>
+                            <div class="grid-2 gap-2 text-sm mt-4">
+                                <button class="btn-primary" onclick="document.querySelector('[data-target=\'view-market\']').click()">🛒 Marketplace</button>
+                                <button class="btn-primary" style="background: var(--secondary); color: var(--primary-dark);" onclick="document.querySelector('[data-target=\'view-weather\']').click()">🌤️ Weather Tracker</button>
+                                <button class="btn-primary bg-dark text-white w-100 col-span-2 anim-pulse mt-2" onclick="document.querySelector('[data-target=\'view-voice\']').click()">🎤 Speak to AI Assistant</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- WEATHER -->
+                <section id="view-weather" class="view hidden">
+                    <h2 class="view-title">Real-Time Weather</h2>
+                    <div id="extreme-weather-alert" class="alert-box blinking hidden text-center mb-4">
+                        <span class="icon">🚨</span> <strong>WARNING: HEAVY RAIN AND WINDS EXPECTED SOON!</strong>
+                    </div>
+                    <div class="card text-center mb-4 weather-hero">
+                        <div class="temp">30°C</div>
+                        <div class="weather-icon anim-float">☀️</div>
+                        <div class="desc text-primary font-bold">Clear Sky</div>
+                        <div class="grid-3 mt-4 text-sm">
+                            <div>💧 Humidity: 55%</div>
+                            <div>🌬️ Wind: 15 km/h</div>
+                            <div>🌧️ Rain: 0%</div>
+                        </div>
+                    </div>
+                    <h3>5-Day Forecast</h3>
+                    <div class="forecast-grid grid-5 mt-3">
+                        <div class="card text-center"><h4>Tomorrow</h4><div class="icon">⛅</div><p>29°C</p></div>
+                        <div class="card text-center"><h4>Day 3</h4><div class="icon">🌧️</div><p>26°C</p></div>
+                        <div class="card text-center"><h4>Day 4</h4><div class="icon">🌧️</div><p>25°C</p></div>
+                        <div class="card text-center"><h4>Day 5</h4><div class="icon">☀️</div><p>28°C</p></div>
+                        <div class="card text-center"><h4>Day 6</h4><div class="icon">☀️</div><p>31°C</p></div>
+                    </div>
+                </section>
+
+                <!-- SMART CROP -->
+                <section id="view-crop" class="view hidden">
+                    <h2 class="view-title">Smart Crop Suggestion System</h2>
+                    <div class="grid-2">
+                        <div class="card">
+                            <h3 class="mb-3">🌤️ Weather Parameters</h3>
+                            <div class="input-field mt-2"><label>Temperature (°C)</label><input type="number" id="crop-temp" value="32"></div>
+                            <div class="input-field mt-3"><label>Humidity (%)</label><input type="number" id="crop-hum" value="45"></div>
+                            <div id="crop-error" class="text-danger text-sm mt-2 hidden">Please enter valid numbers.</div>
+                            <button class="btn-primary w-100 mt-4" onclick="getSmartCropSuggestions()">Get Suggestion</button>
+                            <div id="smart-crop-message" class="mt-3 p-3 bg-success-light border-success text-dark-green rounded font-bold hidden"></div>
+                        </div>
+                        <div class="card">
+                            <h3 class="mb-3">➕ Add Custom Crop</h3>
+                            <form id="add-smart-crop-form">
+                                <div class="input-field"><label>Crop Name</label><input type="text" id="csc-name" required></div>
+                                <div class="grid-2 gap-2 mt-2">
+                                    <div class="input-field"><label>Min Temp</label><input type="number" id="csc-min" required></div>
+                                    <div class="input-field"><label>Max Temp</label><input type="number" id="csc-max" required></div>
+                                </div>
+                                <div class="grid-2 gap-2 mt-2">
+                                    <div class="input-field">
+                                        <label>Water Req.</label>
+                                        <select id="csc-water"><option>Low</option><option>Medium</option><option>High</option></select>
+                                    </div>
+                                    <div class="input-field">
+                                        <label>Profit Level</label>
+                                        <select id="csc-profit"><option>Low</option><option>Medium</option><option>High</option></select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-secondary w-100 mt-4">Add Crop</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Automatic Crop Visualizer -->
+                        <div class="card col-span-2 mt-2">
+                            <h3 class="mb-2">🔍 Automatic Crop Visualizer</h3>
+                            <p class="text-sm text-muted mb-3">Instantly fetch real imagery and data for any vegetable, fruit, or farm entity from Wikipedia's open database.</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="vis-crop-name" class="flex-1 border p-2 rounded" placeholder="Enter crop name (e.g., Mango, Rice, Tractor)">
+                                <button class="btn-primary" onclick="visualizeCrop()">Show Crop</button>
+                            </div>
+                            <div id="vis-result" class="mt-4 hidden text-center">
+                                <div id="vis-card" class="inline-block p-4 border-success rounded shadow bg-white" style="border: 2px solid var(--success); transition: opacity 0.5s ease; opacity: 0; max-width: 400px;">
+                                    <div style="width: 100%; height: 200px; background: #f0f0f0; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                        <img id="vis-img" src="" style="width: 100%; height: 100%; object-fit: cover;" onerror="imgErrorFallback()">
+                                    </div>
+                                    <h4 id="vis-title" class="mt-3 text-primary-dark font-bold text-xl">Loading...</h4>
+                                    <p id="vis-desc" class="text-sm text-muted mt-2">Fetching entity data parameters...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="mt-4 text-success">✅ Best Crops to Grow</h3>
+                    <div id="best-crop-grid" class="cards-grid mt-3"></div>
+                    
+                    <h3 class="mt-4 text-danger">❌ Crops to Avoid</h3>
+                    <div id="avoid-crop-grid" class="cards-grid mt-3"></div>
+                </section>
+
+                <!-- SMART IRRIGATION -->
+                <section id="view-irrigation" class="view hidden">
+                    <h2 class="view-title">Smart Irrigation Analysis</h2>
+                    <div class="card">
+                        <h3>💧 Irrigation Logic Status</h3>
+                        <p class="mt-2 text-muted">Analysis based on current 55% humidity and 30°C temp, combined with 0% rain today.</p>
+                        <div class="result-box border-success mt-4 p-4 text-center text-dark-green text-xl font-bold">
+                            ✅ Light irrigation required in the evening.
+                        </div>
+                    </div>
+                </section>
+
+                <!-- LAND MATH -->
+                <section id="view-land-calc" class="view hidden">
+                    <h2 class="view-title">Land Measurement & Custom Setup Tools</h2>
+                    <div class="card col-span-2">
+                        <h3>Land Area Calculator</h3>
+                        <div class="grid-2 mt-3">
+                            <div class="input-field"><label>Length (ft)</label><input type="number" id="cl-l" value="200"></div>
+                            <div class="input-field"><label>Width (ft)</label><input type="number" id="cl-w" value="150"></div>
+                        </div>
+                        <button class="btn-primary w-100 mt-3" onclick="calculateLand()">Calculate Area</button>
+                        <div id="cl-res" class="result-box mt-3 hidden text-center"></div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <h3>Basic Mathematics Utility</h3>
+                        <input type="text" id="math-display" class="w-100 padding-1 text-right text-lg border rounded mb-2 mt-3" readonly>
+                        <div class="math-grid mt-2">
+                            <button onclick="mathPress('7')">7</button><button onclick="mathPress('8')">8</button><button onclick="mathPress('9')">9</button><button class="math-op" onclick="mathPress('/')">/</button>
+                            <button onclick="mathPress('4')">4</button><button onclick="mathPress('5')">5</button><button onclick="mathPress('6')">6</button><button class="math-op" onclick="mathPress('*')">*</button>
+                            <button onclick="mathPress('1')">1</button><button onclick="mathPress('2')">2</button><button onclick="mathPress('3')">3</button><button class="math-op" onclick="mathPress('-')">-</button>
+                            <button onclick="mathPress('C')">C</button><button onclick="mathPress('0')">0</button><button class="math-eq" onclick="mathCalc()">=</button><button class="math-op" onclick="mathPress('+')">+</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FERTILIZERS -->
+                <section id="view-fert-calc" class="view hidden">
+                    <h2 class="view-title">Fertilizer Calculator</h2>
+                    <div class="card mt-2">
+                        <div class="input-field mt-3"><label>Field Size (Acres)</label><input type="number" id="cf-area" value="3"></div>
+                        <div class="input-field mt-3"><label>Target Crop</label>
+                            <select id="cf-crop">
+                                <option value="wheat">Wheat</option>
+                                <option value="maize">Maize</option>
+                                <option value="soybean">Soybean</option>
+                            </select>
+                        </div>
+                        <button class="btn-primary w-100 mt-4" onclick="calculateFertilizer()">Calculate Usage Map</button>
+                        <div id="cf-res" class="result-box mt-3 hidden text-center"></div>
+                    </div>
+                </section>
+
+                <!-- PROFIT -->
+                <section id="view-profit" class="view hidden">
+                    <div class="flex-between mb-3">
+                        <h2 class="view-title mb-0">Market Price & Profit</h2>
+                        <button class="btn-primary" onclick="addPriceRow()">+ Add Estimation</button>
+                    </div>
+                    <div class="card">
+                        <p class="text-sm text-muted mb-3">Estimate hypothetical profits per acre based on production costs, crop yields, and market shifts.</p>
+                        <div class="table-responsive">
+                            <table class="data-table w-100 text-left" id="profit-table">
+                                <thead><tr><th>Target Crop</th><th>Cost (₹)</th><th>Yield (Qtl)</th><th>Sales Price (₹)</th><th>Est. Profit</th><th>Actions</th></tr></thead>
+                                <tbody id="profit-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CROPS MARKET -->
+                <section id="view-market-crops" class="view hidden">
+                    <div class="flex-between mb-4">
+                        <h2 class="view-title mb-0">Fruits & Vegetables Market</h2>
+                        <button class="btn-primary" onclick="openMarketModal(null, 'crops')">+ List Vegetable / Crop</button>
+                    </div>
+                    <div id="market-grid-crops" class="cards-grid"></div>
+                </section>
+
+                <!-- EQUIPMENT MARKET -->
+                <section id="view-market-equip" class="view hidden">
+                    <div class="flex-between mb-4">
+                        <h2 class="view-title mb-0">Farming Equipment Exchange</h2>
+                        <button class="btn-primary" onclick="openMarketModal(null, 'equip')">+ List Machinery</button>
+                    </div>
+                    <div id="market-grid-equip" class="cards-grid"></div>
+                </section>
+
+                <!-- LAND MARKET -->
+                <section id="view-market-land" class="view hidden">
+                    <div class="flex-between mb-4">
+                        <h2 class="view-title mb-0">Land Leasing & Purchase</h2>
+                        <button class="btn-primary" onclick="openMarketModal(null, 'land')">+ List Real Estate / Acreage</button>
+                    </div>
+                    <div id="market-grid-land" class="cards-grid"></div>
+                </section>
+
+                <!-- CONTACTS -->
+                <section id="view-contacts" class="view hidden">
+                    <div class="flex-between mb-4">
+                        <h2 class="view-title mb-0">Farm Labor & Warehouse Contacts</h2>
+                        <button class="btn-primary" onclick="addContact()">+ New Entity</button>
+                    </div>
+                    <div class="card p-0">
+                        <ul class="contact-list p-3" id="r-contact-list"></ul>
+                    </div>
+                </section>
+
+                <!-- MEDICINES -->
+                <section id="view-medicine" class="view hidden">
+                    <h2 class="view-title">Medicine & Pesticide Guides</h2>
+                    <div class="grid-3 mt-3">
+                        <div class="card border-top-danger">
+                            <h4 class="text-primary-dark">Neem Oil Emulsion Spray</h4>
+                            <hr class="mt-2 mb-2">
+                            <p class="text-sm"><strong>Usage:</strong> Powerful organic pesticide blocking lifecycle of aphids and whiteflies.</p>
+                            <p class="text-sm mt-1"><strong>Dosage:</strong> 5ml per 1L fluid water.</p>
+                        </div>
+                        <div class="card border-top-success">
+                            <h4 class="text-primary-dark">Urea (46% N) Base</h4>
+                            <hr class="mt-2 mb-2">
+                            <p class="text-sm"><strong>Usage:</strong> Rapid Nitrogen infusion for promoting dense, leafy vegetable growth.</p>
+                            <p class="text-sm mt-1"><strong>Dosage:</strong> Sub-surface placement. Highly variable, utilize Fertility checker.</p>
+                        </div>
+                        <div class="card border-top-danger">
+                            <h4 class="text-primary-dark">Copper Oxychloride Paste</h4>
+                            <hr class="mt-2 mb-2">
+                            <p class="text-sm"><strong>Usage:</strong> Protective broad-spectrum fungicide limiting blight spores spread.</p>
+                            <p class="text-sm mt-1"><strong>Dosage:</strong> 2.5g dissolved per 1L water.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- LOANS -->
+                <section id="view-loans" class="view hidden">
+                    <h2 class="view-title">Government Loans & Subsidies</h2>
+                    <div class="card">
+                        <ul class="styled-list">
+                            <li>
+                                <strong>Kisan Credit Card (KCC)</strong> — Short-term crop loans.<br>
+                                <span class="text-sm text-muted">A flat 4% interest rate subsidized limit scaling up to ₹3 Lakhs.</span>
+                                <div class="mt-2"><a href="#" class="btn-secondary text-sm">Apply via Portal</a></div>
+                            </li>
+                            <li>
+                                <strong>PM-KISAN Samman Nidhi</strong> — Yearly income scaffolding.<br>
+                                <span class="text-sm text-muted">Fixed ₹6000/year minimum direct transfer cash support layout for rural agriculture.</span>
+                                <div class="mt-2"><a href="#" class="btn-secondary text-sm">Review Scheme Verification</a></div>
+                            </li>
+                            <li>
+                                <strong>National Agriculture Infra Bank</strong> — Heavy machinery bridging.<br>
+                                <span class="text-sm text-muted">Subsidized capital deployment expressly targeting warehousing and storage silos.</span>
+                                <div class="mt-2"><a href="#" class="btn-secondary text-sm">Launch Portal</a></div>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- MONITORS -->
+                <section id="view-monitor" class="view hidden">
+                    <h2 class="view-title">Drone Monitoring & Pollution Upload</h2>
+                    <div class="grid-2">
+                        <div class="card col-span-2 text-center overflow-hidden p-0 relative">
+                            <h3 class="absolute top-0 left-0 p-3 z-10 text-white shadow-text">Active Perimeter Field Monitoring <span class="badge bg-danger blink p-1 ml-2 rounded text-xs">LIVE STREAM</span></h3>
+                            <div class="bg-dark flex-center relative" style="height: 400px; background: url('https://images.unsplash.com/photo-1586771107445-d3af23b44b82?auto=format&fit=crop&w=1200&q=80') center/cover;">
+                                <div class="absolute inset-0" style="background: rgba(0,0,0,0.3);"></div>
+                                <div class="text-white text-xl z-10 shadow-text">
+                                    📷 <br> Secure Drone Array Feed Connected <br> <span class="text-sm border p-1 rounded mt-2 inline-block">CAM-01 Alpha - Sector 4 Grid</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card col-span-2">
+                            <h3>File Plant Disease & Pollution Report</h3>
+                            <p class="text-sm text-muted mb-3">Notice excessive leaf mold, soil contamination, or unidentified blights in Sector 4? Submit a photograph into the visual AI parameter scanner for automated pathology reports.</p>
+                            <input type="file" id="photo-upload" accept="image/*" class="w-100 border p-2 rounded cursor-pointer">
+                            <div id="photo-preview-box" class="mt-3 hidden bg-bg-color p-3 rounded flex" style="align-items: center; gap: 1rem;">
+                                <img id="uploaded-img" src="" class="rounded shadow" style="max-height: 250px; width: 300px; object-fit: cover;">
+                                <div class="flex-1">
+                                    <h4 class="text-primary-dark">Uploading Neural Vectors...</h4>
+                                    <div class="progress-bar mt-2"><div class="progress blinking" style="width: 100%;">SCANNING</div></div>
+                                    <p class="text-sm mt-3 text-muted">Checking internal databases matched against visual inputs regarding heavy metal traces and insect vectors...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VOICE AI -->
+                <section id="view-voice" class="view hidden">
+                    <div class="flex-between">
+                        <h2 class="view-title mb-0">Heuristic Voice AI Analyst</h2>
+                        <span class="badge bg-success text-white p-1 rounded font-bold">CORE ONLINE</span>
+                    </div>
+                    
+                    <div class="card chat-layout mt-3">
+                        <div class="chat-history" id="chat-history">
+                            <div class="msg ai-msg">
+                                <div class="bubble">
+                                    <strong>Terminal booted.</strong> I am your integrated analytic voice processor. Utilizing microphone inputs, ask me critical sector metrics.<br><br>Examples:<br>- <i>"Mausam kaisa hai?"</i> (Predictive Weather Models)<br>- <i>"Kaunsi fasal ugau?"</i> (Crop Logic Tree)<br>- <i>"Pani dena hai kya?"</i> (Sensory Irrigation Metrics)<br>- <i>"Tractor price?"</i> (Scrape Market)<br>- <i>"Emergency alert!"</i> (Trigger Global Lock)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-controls flex mt-3 gap-2">
+                            <input type="text" id="ai-input" class="flex-1 p-2 border rounded border-primary" placeholder="Type a farming query..." autocomplete="off">
+                            <button class="btn-icon circle primary-bg text-white" id="ai-mic" title="Voice Input">🎤</button>
+                            <button class="btn-icon circle dark-bg text-white" id="ai-send">➡️</button>
+                        </div>
+                        <div id="ai-status" class="text-center text-sm text-primary mt-1 hidden blink">Mic active. Parsing audio input layer...</div>
+                    </div>
+                </section>
+
+
+                <!-- CALENDAR -->
+                <section id="view-calendar" class="view hidden">
+                    <h2 class="view-title">Dynamic Sowing Phase Calendar</h2>
+                    <div class="card p-0 overflow-hidden">
+                        <div class="calendar-header flex-between p-3 bg-primary text-white">
+                            <button class="btn-icon circle dark-bg" onclick="changeMonth(-1)">◀</button>
+                            <h3 id="cal-title" class="mb-0 text-xl font-bold">Month Year</h3>
+                            <button class="btn-icon circle dark-bg" onclick="changeMonth(1)">▶</button>
+                        </div>
+                        <div class="calendar-grid bg-white p-2 text-center" id="real-calendar-grid">
+                            <!-- Populated via JS Date object logic -->
+                        </div>
+                        <div class="p-3 bg-bg-color text-sm border-top">
+                            <span class="badge highlight mr-2" style="background:var(--success-light); display:inline-block; width:15px; height:15px; border-radius:3px;"></span> Core Calculated Sowing Windows (Algorithmic Demo)
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Global Market Modal Form -->
+                <div id="market-modal" class="modal hidden">
+                    <div class="modal-content border-top-success">
+                        <span class="close-modal" onclick="closeMarketModal()">&times;</span>
+                        <h3 class="mb-3">Inject Marketplace Object</h3>
+                        <form id="market-form">
+                            <input type="hidden" id="m-cat">
+                            <div class="input-field mt-2"><label>Unit Classification / Title</label><input type="text" id="m-title" required placeholder="E.G: Soybean Output, John Deere Engine"></div>
+                            <div class="input-field mt-2"><label>Numerical Worth String</label><input type="text" id="m-price" required placeholder="E.G: ₹15/kg, ₹400000"></div>
+                            <div class="input-field mt-2" id="m-img-block"><label>Visual Reference Node (URL) <span class="text-xs text-muted">(Auto-Generated for Crops)</span></label><input type="text" id="m-img" placeholder="https:// images.unsplash.com/..."></div>
+                            <div class="input-field mt-2 hidden"><label>Asset Description Block</label><textarea id="m-desc" placeholder="Provide condition specifications..."></textarea></div>
+                            <div class="input-field mt-2"><label>Tele-routing Number</label><input type="text" id="m-contact" required placeholder="User contact info."></div>
+                            <button type="submit" class="btn-primary w-100 mt-3">Finalize Operation</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
